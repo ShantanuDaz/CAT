@@ -7,7 +7,11 @@ const LogoutButton = () => {
   const [showProfile, setShowProfile] = useState(false)
 
   const handleLogout = async () => {
-    await signOut()
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('Logout failed:', error?.message || 'Unknown error');
+    }
   }
 
   return (

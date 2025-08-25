@@ -1,17 +1,25 @@
-import { Modal } from 'react-simplicity-lib'
-import { AlertTriangle } from 'lucide-react'
+import { Modal } from "react-simplicity-lib";
+import { AlertTriangle } from "lucide-react";
 
-const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Delete', cancelText = 'Cancel', style }) => {
+const ConfirmDialog = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Delete",
+  cancelText = "Cancel",
+}) => {
   return (
-    <Modal isOpen={isOpen} onModalClose={onClose} style={style}>
+    <Modal isOpen={isOpen} onModalClose={onClose} style={{ zIndex: 1000001 }}>
       <div className="w-96 p-6 bg-white rounded-lg">
         <div className="flex items-center gap-3 mb-4">
           <AlertTriangle className="text-red-500" size={24} />
           <h2 className="text-lg font-semibold">{title}</h2>
         </div>
-        
+
         <p className="text-gray-600 mb-6">{message}</p>
-        
+
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
@@ -31,7 +39,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
         </div>
       </div>
     </Modal>
-  )
-}
+  );
+};
 
-export default ConfirmDialog
+export default ConfirmDialog;

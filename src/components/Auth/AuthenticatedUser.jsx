@@ -1,45 +1,50 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import LoginSignup from './LoginSignup'
-import UserProfile from './UserProfile'
-import App from '../../App'
+import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabase";
+import { useSnapshot } from "valtio";
+import { store } from "../../store/store";
+import ErrorBoundary from "../common/ErrorBoundary";
+import LoginSignup from "./LoginSignup";
+import UserProfile from "./UserProfile";
+import App from "../../App";
 
 const AuthenticatedUser = () => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [showProfile, setShowProfile] = useState(false)
+  const { user } = useSnapshot(store);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      store.setUser(session?.user ?? null);
+    };
 
-    getSession()
+    getSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      const newUser = session?.user ?? null
-      setUser(newUser)
-      
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const newUser = session?.user ?? null;
+      store.setUser(newUser);
+
       // Check if Google user needs to set username
-      if (newUser && newUser.app_metadata?.provider === 'google' && !newUser.user_metadata?.username) {
-        setShowProfile(true)
+      if (
+        newUser &&
+        newUser.app_metadata?.provider === "google" &&
+        !newUser.user_metadata?.username
+      ) {
+        setShowProfile(true);
       }
-    })
+    });
 
-    return () => subscription.unsubscribe()
-  }, [])
-
-  if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
-  }
+    return () => subscription.unsubscribe();
+  }, []);
 
   if (showProfile) {
-    return <UserProfile onClose={() => setShowProfile(false)} />
+    return <UserProfile onClose={() => setShowProfile(false)} />;
   }
 
-  return user ? <App /> : <LoginSignup />
-}
+  return <ErrorBoundary>{user ? <App /> : <LoginSignup />}</ErrorBoundary>;
+};
 
-export default AuthenticatedUser
+export default AuthenticatedUser;
