@@ -1,8 +1,9 @@
-import DOMPurify from "dompurify";
-import { useState, useEffect } from "react";
+import * as DOMPurify from "dompurify";
+import { useState } from "react";
 import { Modal } from "react-simplicity-lib";
 import { store } from "../../store/store";
 import ConfirmDialog from "./ConfirmDialog";
+
 const CURDTopic = ({
   isOpen = false,
   closeModal,
@@ -20,17 +21,27 @@ const CURDTopic = ({
   const [desName, setDesName] = useState(topic?.description || "");
 
   const handleCreateAndEdit = () => {
+    if (validate() === false) {
+      alert("Empty Field");
+      return;
+    }
+    if (checkDuplicate() === true) {
+      alert("Duplicate topic name");
+      return;
+    }
+    const sanitizedTopicName = DOMPurify.default.sanitize(topicName);
+    const sanitizedDesName = DOMPurify.default.sanitize(desName);
     if (topicIndex !== null) {
       currentLevel.topics[topicIndex] = {
         ...currentLevel.topics[topicIndex],
-        name: topicName,
-        description: desName,
+        name: sanitizedTopicName,
+        description: sanitizedDesName,
         update_at: new Date().toISOString(),
       };
     } else {
       currentLevel.topics.push({
-        name: topicName,
-        description: desName,
+        name: sanitizedTopicName,
+        description: sanitizedDesName,
         created_at: new Date().toISOString(),
         topics: [],
         contentItems: { Notes: [], Questions: [], Tricks: [] },
@@ -38,6 +49,16 @@ const CURDTopic = ({
     }
     store.saveTree();
     closeModal();
+  };
+
+  const validate = () => {
+    if (!topicName) return false;
+    return true;
+  };
+
+  const checkDuplicate = () => {
+    if (topicIndex !== null) return false;
+    return currentLevel.topics.some((topic) => topic.name === topicName);
   };
 
   const handleDelete = () => {

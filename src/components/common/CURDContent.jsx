@@ -1,8 +1,9 @@
-import DOMPurify from "dompurify";
-import { useState, useEffect } from "react";
+import * as DOMPurify from "dompurify";
+import { useState } from "react";
 import { Modal } from "react-simplicity-lib";
 import { store } from "../../store/store";
 import ConfirmDialog from "./ConfirmDialog";
+
 const CURDContent = ({
   isOpen = false,
   closeModal,
@@ -26,24 +27,48 @@ const CURDContent = ({
   const [docURL, setDocURL] = useState(content?.docURL || "");
 
   const handleCreateAndEdit = () => {
+    if (validate() === false) {
+      alert("Empty Field");
+      return;
+    }
+    if (checkDuplicate() === true) {
+      alert("Duplicate topic name");
+      return;
+    }
+    const sanitizeContentName = DOMPurify.default.sanitize(contentName);
+    const sanitizeDesName = DOMPurify.default.sanitize(desName);
+    const sanitizeDocURL = DOMPurify.default.sanitize(docURL);
     if (contentIndex !== null) {
       topic.contentItems[contentType][contentIndex] = {
         ...topic.contentItems[contentType][contentIndex],
-        name: contentName,
-        description: desName,
-        docURL,
+        name: sanitizeContentName,
+        description: sanitizeDesName,
+        docURL: sanitizeDocURL,
         update_at: new Date().toISOString(),
       };
     } else {
       topic.contentItems[contentType].push({
-        name: contentName,
-        description: desName,
-        docURL,
+        name: sanitizeContentName,
+        description: sanitizeDesName,
+        docURL: sanitizeDocURL,
         created_at: new Date().toISOString(),
       });
     }
     store.saveTree();
     closeModal();
+  };
+
+  const validate = () => {
+    if (!contentName) return false;
+    if (!docURL) return false;
+    return true;
+  };
+
+  const checkDuplicate = () => {
+    if (contentIndex !== null) return false;
+    return topic.contentItems[contentType].some(
+      (content) => content.name === contentName
+    );
   };
 
   const handleDelete = () => {

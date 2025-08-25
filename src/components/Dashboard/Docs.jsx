@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { store } from "../../store/store";
 import CURDContent from "../common/CURDContent";
@@ -26,7 +26,10 @@ const Docs = ({
 
   return (
     <div className="w-full border rounded-lg cursor-pointer grid grid-cols-[1fr_max-content_max-content] justify-between overflow-hidden">
-      <div className="p-3 hover:bg-gray-100 overflow-hidden">
+      <div
+        onClick={() => window.open(content.docURL, "_blank")}
+        className="p-3 hover:bg-gray-100 overflow-hidden"
+      >
         <h3 className="font-medium">{content.name}</h3>
         <p className="text-sm text-gray-500 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
           {content.description}
