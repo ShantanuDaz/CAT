@@ -58,19 +58,18 @@ const Topic = ({ openTopic, topicPath = [], topicIndex = null }) => {
         topicPath={topicPath}
         topicIndex={topicIndex}
       />
-      {isEditTopic ||
-        (isDeleteTopic && (
-          <CURDTopic
-            isOpen={isEditTopic}
-            isDelete={isDeleteTopic}
-            closeModal={() => {
-              setIsEditTopic(false);
-              setIsDeleteTopic(false);
-            }}
-            parentPath={topicPath}
-            topicIndex={topicIndex}
-          />
-        ))}
+      {(isEditTopic || isDeleteTopic) && (
+        <CURDTopic
+          isOpen={isEditTopic}
+          isDelete={isDeleteTopic}
+          closeModal={() => {
+            setIsEditTopic(false);
+            setIsDeleteTopic(false);
+          }}
+          parentPath={topicPath}
+          topicIndex={topicIndex}
+        />
+      )}
     </div>
   );
 };
