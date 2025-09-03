@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
       manifest: {
-        name: "My Vite PWA",
+        name: "My Exam Prep",
         short_name: "Vite PWA",
         theme_color: "#ffffff",
         icons: [
