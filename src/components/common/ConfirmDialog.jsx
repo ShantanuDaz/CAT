@@ -18,7 +18,10 @@ const ConfirmDialog = ({
           <h2 className="text-lg font-semibold">{title}</h2>
         </div>
 
-        <p className="text-gray-600 mb-6">{message}</p>
+        <p
+          className="text-gray-600 mb-6"
+          dangerouslySetInnerHTML={{ __html: message }}
+        ></p>
 
         <div className="flex gap-3 justify-end">
           <button

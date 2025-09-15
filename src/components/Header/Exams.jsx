@@ -1,4 +1,4 @@
-import { X, Plus, Edit, Trash2 } from "lucide-react";
+import { X, Plus, Edit, Trash2, Undo2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Modal } from "react-simplicity-lib";
 import { store } from "../../store/store";
@@ -11,6 +11,7 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
   const [isAddingExam, setIsAddingExam] = useState(exams.length === 0);
   const [isEditingExam, setIsEditingExam] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const [newExam, setNewExam] = useState("");
   const [oldExam, setOldExam] = useState("");
 
@@ -21,11 +22,16 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
       setIsAddingExam(false);
     }
   }, [exams.length]);
-  const addNewEaxm = () => {
+
+  const addNewEaxm = (addDuplicate = false) => {
     const val = newExam.trim();
     if (val === "") return;
     if (store.selectedExam === "" || exams.length === 0)
       store.selectedExam = val;
+    if (exams.includes(val) && !addDuplicate) {
+      setIsDuplicate(true);
+      return;
+    }
     store.content = {
       ...store.content,
       [val]: {
@@ -82,64 +88,90 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
     setIsDeleting(false);
     setOldExam("");
   };
+
+  const stopEditing = () => {
+    setIsEditingExam(false);
+    setIsAddingExam(false);
+    setNewExam("");
+    setOldExam("");
+  };
   return (
     <>
-      <Modal isOpen={isOpen}>
-        <div className="bg-white p-2 rounded-xl">
-          <div className="flex justify-end">
-            <X onClick={() => closeExams()} />
-          </div>
-          {isAddingExam || isEditingExam || exams.length === 0 ? (
-            <div>
-              <input
-                type="text"
-                placeholder="Exam Name"
-                value={newExam}
-                onChange={(e) => setNewExam(e.target.value)}
+      <Modal isOpen={isOpen} onModalClose={() => closeExams()}>
+        <div className="bg-white p-2 rounded-xl min-h-[50vh] min-w-[50vw] grid grid-rows-[max-content_1fr_max-content] gap-1">
+          <div className="flex justify-end border-b-2 border-gray-200">
+            {(isAddingExam || isEditingExam) && (
+              <Undo2
+                onClick={() => stopEditing()}
+                className="cursor-pointer mr-2"
               />
-              <button
-                onClick={() => (isAddingExam ? addNewEaxm() : EditExamName())}
-              >
-                {isAddingExam ? "Add" : "Edit"}
-              </button>
-            </div>
-          ) : (
-            <div>
-              {exams.map((exam) => (
-                <div
-                  key={exam}
-                  className="flex items-center justify-between gap-2"
+            )}
+            <X onClick={() => closeExams()} className="cursor-pointer" />
+          </div>
+          <div className="overflow-auto grid">
+            {isAddingExam || isEditingExam || exams.length === 0 ? (
+              <div className="grid gap-5 m-auto place-content-center place-items-center w-full">
+                <input
+                  type="text"
+                  id="examName"
+                  placeholder="Exam Name"
+                  value={newExam}
+                  onChange={(e) => setNewExam(e.target.value)}
+                  className="border-2 border-gray-200 rounded-md p-2 w-full"
+                />
+                <button
+                  onClick={() => (isAddingExam ? addNewEaxm() : EditExamName())}
+                  className="bg-blue-500 text-white rounded-md p-2 px-3 w-fit hover:bg-blue-600 transition-colors"
                 >
-                  <h4
+                  {isAddingExam ? "Add" : "Edit"}
+                </button>
+              </div>
+            ) : (
+              <div className="h-fit grid gap-2">
+                {exams.map((exam) => (
+                  <div
+                    key={exam}
                     onClick={() => {
                       store.selectedExam = exam;
                       closeExams();
                     }}
+                    className="h-fit flex items-center justify-between gap-2 bg-gray-50 p-2 rounded-xl border-1 border-gray-200 hover:bg-gray-100 cursor-pointer"
                   >
-                    {exam}
-                  </h4>
-                  <div>
-                    <button
-                      className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
-                      title="Edit topic"
-                      onClick={() => EditingExamName(exam)}
-                    >
-                      <Edit size={20} />
-                    </button>
-                    <button
-                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
-                      title="Delete topic"
-                      onClick={() => DeletingExam(exam)}
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    <h4>{exam}</h4>
+                    <div>
+                      <button
+                        className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                        title="Edit topic"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          EditingExamName(exam);
+                        }}
+                      >
+                        <Edit size={20} />
+                      </button>
+                      <button
+                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                        title="Delete topic"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          DeletingExam(exam);
+                        }}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
           {exams.length !== 0 && (
-            <Plus onClick={() => setIsAddingExam("adding")} />
+            <div
+              onClick={() => setIsAddingExam("adding")}
+              className="w-full p-1 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-600"
+            >
+              <Plus />
+            </div>
           )}
         </div>
       </Modal>
@@ -151,8 +183,19 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
         }}
         onConfirm={DeleteExam}
         title="Delete Exam"
-        message={`Are you sure you want to delete the exam "${oldExam}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete the exam <strong>${oldExam}</strong>? This action cannot be undone.`}
         confirmText="Delete"
+        cancelText="Cancel"
+      />
+      <ConfirmDialog
+        isOpen={isDuplicate}
+        onClose={() => {
+          setIsDuplicate(false);
+        }}
+        onConfirm={() => addNewEaxm(true)}
+        title="Duplicate Value Found"
+        message={`Are you sure you want to replace the exam <strong>${newExam}</strong>? This will remove all the previous content and this action cannot be undone.`}
+        confirmText="Duplicate"
         cancelText="Cancel"
       />
     </>
