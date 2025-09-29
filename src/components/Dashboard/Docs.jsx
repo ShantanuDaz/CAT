@@ -25,7 +25,7 @@ const Docs = ({
   const [isDeleteContent, setIsDeleteContent] = useState(false);
 
   return (
-    <div className="w-full border rounded-lg cursor-pointer grid grid-cols-[1fr_max-content_max-content] justify-between overflow-hidden">
+    <div className="w-full border rounded-lg cursor-pointer grid grid-cols-[1fr_max-content_max-content] justify-between overflow-hidden mb-2">
       <div
         onClick={() => window.open(content.docURL, "_blank")}
         className="p-3 hover:bg-gray-100 overflow-hidden"

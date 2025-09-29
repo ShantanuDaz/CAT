@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { getCurrentUser } from "../../lib/auth";
+import { useState } from "react";
 import LogoutButton from "../Auth/LogoutButton";
 import { store } from "../../store/store";
 import { useSnapshot } from "valtio";
@@ -7,28 +6,11 @@ import { ChevronDown, Plus } from "lucide-react";
 import Exams from "./Exams";
 const Header = () => {
   const snap = useSnapshot(store);
-  const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const exams = Object.keys(snap.content);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error(
-          "Failed to get current user:",
-          error?.message || "Unknown error"
-        );
-        setUser(null);
-      }
-    };
-    loadUser();
-  }, []);
-
   const username =
-    user?.user_metadata?.username || user?.email?.split("@")[0] || "User";
+    snap.user?.user_metadata?.username || snap.user?.email?.split("@")[0] || "User";
 
   return (
     <header className="shadow p-4 flex justify-between items-center">
@@ -36,7 +18,7 @@ const Header = () => {
         {exams.length > 0 ? (
           <>
             <span>
-              <span className="font-bold">{snap.selectedExam} Perp</span>
+              <span className="font-bold">{snap.selectedExam} Prep</span>
             </span>
             <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
               <ChevronDown onClick={() => setIsOpen(true)} />

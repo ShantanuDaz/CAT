@@ -4,11 +4,14 @@ import { simpleAPI } from "../api/simpleAPI.js";
 // Valtio store
 export const store = proxy({
   user: null,
-  selectedExam: "",
+  selectedExam: localStorage.getItem("selectedExam") || "",
   content: {},
   isUpdating: false,
   updateMessage: "",
-
+  setSelectedExam(exam) {
+    localStorage.setItem("selectedExam", exam);
+    this.selectedExam = exam;
+  },
   // Helper to navigate to any path in content tree
   getLevel(path = []) {
     let level = this.content;
@@ -34,11 +37,17 @@ export const store = proxy({
     if (!this.user) return;
 
     try {
+      this.isUpdating = true;
+      this.updateMessage = "Loading...";
       const tree = await simpleAPI.getTree(this.user.id);
       this.content = tree;
-      this.selectedExam = Object.keys(this.content)[0];
+      this.selectedExam =
+        localStorage.getItem("selectedExam") || Object.keys(this.content)[0];
     } catch (error) {
       console.error("Failed to load tree:", error);
+    } finally {
+      this.isUpdating = false;
+      this.updateMessage = "";
     }
   },
 

@@ -8,22 +8,30 @@ import CURDTopic from "../common/CURDTopic";
 import { Modal } from "react-simplicity-lib";
 
 const Section = ({ parentPath = [] }) => {
-  const [isAddEditinTopics, setIsAddEditinTopics] = useState(false);
-  const [isTopicExpanded, setIsTopicExpanded] = useState(false);
-  const [edittingTopicIndex, setEdittingTopicIndex] = useState(null);
   const snap = useSnapshot(store);
   const myRef = useRef(null);
 
   let currentLevel = snap.content;
+  let breadCrumb = "";
   for (const { type, name, index = 0 } of parentPath) {
-    if (type === "object") currentLevel = currentLevel[name];
-    else currentLevel = currentLevel.topics[index];
+    let val =
+      type === "object"
+        ? currentLevel[name] || {}
+        : (currentLevel?.topics && currentLevel?.topics[index]) || {};
+    currentLevel = val;
+    if (currentLevel?.name) breadCrumb += currentLevel?.name + " > ";
   }
+
+  const [isAddEditinTopics, setIsAddEditinTopics] = useState(false);
+  const [isTopicExpanded, setIsTopicExpanded] = useState(
+    getTopicExpandedStateLocal(breadCrumb)
+  );
+  const [edittingTopicIndex, setEdittingTopicIndex] = useState(null);
 
   const topics = currentLevel?.topics || [];
 
   useEffect(() => {
-    setIsTopicExpanded(false);
+    setIsTopicExpanded(getTopicExpandedStateLocal(breadCrumb));
     if (myRef.current) {
       myRef.current.scrollIntoView({
         behavior: "smooth",
@@ -50,8 +58,10 @@ const Section = ({ parentPath = [] }) => {
                 topic={topic}
                 topicIndex={id}
                 openTopic={() => {
-                  if (id === isTopicExpanded) setIsTopicExpanded(false);
-                  else setIsTopicExpanded(id);
+                  let val = id === isTopicExpanded ? false : id;
+                  if (id === isTopicExpanded) setIsTopicExpanded(val);
+                  else setIsTopicExpanded(val);
+                  setTopicExpandedStateLocal(breadCrumb, val);
                 }}
                 topicPath={[...parentPath]}
               />
@@ -100,3 +110,27 @@ const Section = ({ parentPath = [] }) => {
 };
 
 export default Section;
+
+const getTopicExpandedStateLocal = (breadCrumb = "") => {
+  if (breadCrumb.includes("undefined")) debugger;
+  const expandedSections = localStorage.getItem("expandedSections");
+  if (!expandedSections) return false;
+  const parsed = JSON.parse(expandedSections);
+  const val = parsed && parsed[breadCrumb];
+  if (val === undefined) return false;
+  if (val === null) return false;
+  if (val === "") return false;
+  if (val === "false") return false;
+  if (val === "true") return true;
+  if (val === "0") return 0;
+  return val;
+};
+
+const setTopicExpandedStateLocal = (breadCrumb, val) => {
+  let expandedSections = localStorage.getItem("expandedSections");
+  if (!expandedSections) expandedSections = {};
+  else expandedSections = JSON.parse(expandedSections);
+  if (val === false) delete expandedSections[breadCrumb];
+  else expandedSections[breadCrumb] = val;
+  localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
+};

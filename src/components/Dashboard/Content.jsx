@@ -42,8 +42,11 @@ const Content = ({ isOpen, closeModal, topicPath = [], topicIndex = null }) => {
           </section>
           <Tabs Tabs={contentTypes} className="w-full h-full">
             {contentTypes.map((type, id) => (
-              <Tab key={id}>
-                <div key={id}>
+              <Tab
+                key={id}
+                className="p-2 h-full grid gap-4 grid-rows-[1fr_max-content]"
+              >
+                <div className="h-full overflow-auto">
                   {content[type]?.length === 0 ? (
                     <div className="text-center text-gray-500 py-8">
                       <p>No items yet</p>
@@ -51,22 +54,24 @@ const Content = ({ isOpen, closeModal, topicPath = [], topicIndex = null }) => {
                     </div>
                   ) : (
                     content[type]?.map((item, index) => (
-                      <Docs
-                        key={index}
-                        contentType={type}
-                        topicPath={topicPath}
-                        topicIndex={topicIndex}
-                        contentIndex={index}
-                      />
+                      <>
+                        <Docs
+                          key={index}
+                          contentType={type}
+                          topicPath={topicPath}
+                          topicIndex={topicIndex}
+                          contentIndex={index}
+                        />
+                      </>
                     ))
                   )}
-                  <button
-                    onClick={() => setIsAddContent(type)}
-                    className="w-full p-3 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-600"
-                  >
-                    <Plus size={20} />
-                  </button>
                 </div>
+                <button
+                  onClick={() => setIsAddContent(type)}
+                  className="w-full p-3 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-600"
+                >
+                  <Plus size={20} />
+                </button>
               </Tab>
             ))}
           </Tabs>

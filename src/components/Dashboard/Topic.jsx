@@ -20,37 +20,39 @@ const Topic = ({ openTopic, topicPath = [], topicIndex = null }) => {
   const [isContentOpen, setIsContentOpen] = useState(false);
 
   return (
-    <div className="w-full border rounded-lg cursor-pointer grid grid-cols-[1fr_max-content_max-content] justify-between overflow-hidden">
-      <div
-        onClick={() => setIsContentOpen(true)}
-        className="p-3 hover:bg-gray-100 overflow-hidden"
-      >
-        <h3 className="font-medium">{topic.name}</h3>
-        <p className="text-sm text-gray-500 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-          {topic.description}
-        </p>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={() => setIsEditTopic(true)}
-          className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
-          title="Edit topic"
+    <>
+      <div className="w-full border rounded-lg cursor-pointer grid grid-cols-[1fr_max-content_max-content] justify-between overflow-hidden">
+        <div
+          onClick={() => setIsContentOpen(true)}
+          className="p-3 hover:bg-gray-100 overflow-hidden"
         >
-          <Edit size={20} />
-        </button>
-        <button
-          onClick={() => setIsDeleteTopic(true)}
-          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
-          title="Delete topic"
+          <h3 className="font-medium">{topic.name}</h3>
+          <p className="text-sm text-gray-500 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
+            {topic.description}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsEditTopic(true)}
+            className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+            title="Edit topic"
+          >
+            <Edit size={20} />
+          </button>
+          <button
+            onClick={() => setIsDeleteTopic(true)}
+            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+            title="Delete topic"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
+        <div
+          className="border-l-2 p-3 flex hover:bg-gray-100"
+          onClick={() => openTopic()}
         >
-          <Trash2 size={20} />
-        </button>
-      </div>
-      <div
-        className="border-l-2 p-3 flex hover:bg-gray-100"
-        onClick={() => openTopic()}
-      >
-        <ChevronRight size={24} className="self-center justify-self-center" />
+          <ChevronRight size={24} className="self-center justify-self-center" />
+        </div>
       </div>
       <Content
         isOpen={isContentOpen}
@@ -70,7 +72,7 @@ const Topic = ({ openTopic, topicPath = [], topicIndex = null }) => {
           topicIndex={topicIndex}
         />
       )}
-    </div>
+    </>
   );
 };
 

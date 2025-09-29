@@ -27,7 +27,7 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
     const val = newExam.trim();
     if (val === "") return;
     if (store.selectedExam === "" || exams.length === 0)
-      store.selectedExam = val;
+      store.setSelectedExam(val);
     if (exams.includes(val) && !addDuplicate) {
       setIsDuplicate(true);
       return;
@@ -65,7 +65,7 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
       store.saveTree();
     }
     if (oldExam === store.selectedExam) {
-      store.selectedExam = val;
+      store.setSelectedExam(val);
     }
     setNewExam("");
     setOldExam("");
@@ -82,7 +82,7 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
     delete updatedContent[oldExam];
     store.content = updatedContent;
     if (store.selectedExam === oldExam) {
-      store.selectedExam = Object.keys(updatedContent)[0] || "";
+      store.setSelectedExam(Object.keys(updatedContent)[0] || "");
     }
     store.saveTree();
     setIsDeleting(false);
@@ -132,10 +132,12 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
                   <div
                     key={exam}
                     onClick={() => {
-                      store.selectedExam = exam;
+                      store.setSelectedExam(exam);
                       closeExams();
                     }}
-                    className="h-fit flex items-center justify-between gap-2 bg-gray-50 p-2 rounded-xl border-1 border-gray-200 hover:bg-gray-100 cursor-pointer"
+                    className={`h-fit flex items-center justify-between gap-2 p-2 rounded-xl border-1 border-gray-200 hover:bg-gray-100 cursor-pointer ${
+                      snap.selectedExam === exam ? "bg-blue-100" : "bg-gray-50"
+                    }`}
                   >
                     <h4>{exam}</h4>
                     <div>
@@ -167,7 +169,7 @@ const Exams = ({ isOpen = false, closeExams = () => {} }) => {
           </div>
           {exams.length !== 0 && (
             <div
-              onClick={() => setIsAddingExam("adding")}
+              onClick={() => setIsAddingExam(true)}
               className="w-full p-1 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-600"
             >
               <Plus />

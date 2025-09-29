@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Modal } from "react-simplicity-lib";
 import { store } from "../../store/store";
 import ConfirmDialog from "./ConfirmDialog";
-
+const googleNewDocUrl = "https://docs.google.com/document/create";
 const CURDContent = ({
   isOpen = false,
   closeModal,
@@ -117,7 +117,15 @@ const CURDContent = ({
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1" htmlFor="docURL">
-              Doc URL
+              Doc URL{" "}
+              <button
+                className="text-blue-500 border-1 rounded-xl px-1 py-0.5 hover:bg-blue-50"
+                onClick={() => window.open(googleNewDocUrl, "__blank")}
+              >
+                Create URL
+              </button>
+              <br />
+              <span>Note: Paste the url/link of the document </span>
             </label>
             <input
               id="docURL"

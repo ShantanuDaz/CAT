@@ -1,23 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSnapshot } from "valtio";
 import { store } from "../../store/store";
 import Section from "./Section";
 
 const Dashboard = () => {
-  const { user } = useSnapshot(store);
-  const [loadError, setLoadError] = useState(null);
   const snap = useSnapshot(store);
+  const [loadError, setLoadError] = useState(null);
+  const hasLoadedRef = useRef(false);
+  
   useEffect(() => {
-    if (user) {
+    if (snap.user && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
       store.loadTree().catch((error) => {
         const sanitizedError = "Failed to load content tree";
         console.error(sanitizedError);
         setLoadError("Unable to load your content. Please refresh the page.");
       });
     }
-  }, [user]);
+  }, [snap.user]);
 
-  if (!user) {
+  if (!snap.user) {
     return (
       <div className="flex items-center justify-center h-full">Loading...</div>
     );
